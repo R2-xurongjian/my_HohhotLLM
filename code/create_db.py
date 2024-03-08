@@ -36,7 +36,6 @@ def get_text(dir_path):
             loader = UnstructuredFileLoader(one_file)
         elif file_type in ('doc', 'docx'):
             # 处理 Word 文档
-            # 你需要使用适当的文档加载器，这里假设你有一个名为 UnstructuredWordLoader 的加载器
             loader = UnstructuredWordLoader(one_file)
         else:
             # 如果是不符合条件的文件，直接跳过
