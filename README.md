@@ -21,107 +21,87 @@ Urban Large Language Model for Hohhot (呼和浩特城市大模型)
 * 克隆本项目
 ```bash
 cd ~
-git clone https://github.com/scutcyr/SoulChat.git
+git clone https://github.com/R2-xurongjian/my_HohhotLLM.git
+```
+* 下载模型    
+本项目使用的LLM模型为复旦大学研发的InternLM（书生·浦语）大语言模型，建议手动在huggingface上下载模型也可以git下载
+```
+git clone https://huggingface.co/internlm/internlm2-chat-7b
 ```
 
-* 安装依赖    
-需要注意的是torch的版本需要根据你的服务器实际的cuda版本选择，详情参考[pytorch安装指南](https://pytorch.org/get-started/previous-versions/)
-```bash
-cd SoulChat
-conda env create -n proactivehealthgpt_py38 --file proactivehealthgpt_py38.yml
-conda activate proactivehealthgpt_py38
-
-pip install cpm_kernels
-pip install torch==1.13.1+cu116 torchvision==0.14.1+cu116 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu116
+* 创建并激活conda环境    
+这里我不做具体的虚拟conda环境的创建
+```
+conda activate InternLM
 ```
 
-* 【补充】Windows下的用户推荐参考如下流程配置环境
-```bash
-cd BianQue
-conda create -n proactivehealthgpt_py38 python=3.8
-conda activate proactivehealthgpt_py38
-pip install torch==1.13.1+cu116 torchvision==0.14.1+cu116 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu116
-pip install -r requirements.txt
-pip install rouge_chinese nltk jieba datasets
-# 以下安装为了运行demo
-pip install streamlit
-pip install streamlit_chat
+* 安装Langchain相关依赖
 ```
-* 【补充】Windows下配置CUDA-11.6：[下载并且安装CUDA-11.6](https://developer.nvidia.com/cuda-11-6-0-download-archive?target_os=Windows&target_arch=x86_64&target_version=11&target_type=exe_local)、[下载cudnn-8.4.0，解压并且复制其中的文件到CUDA-11.6对应的路径](https://developer.nvidia.com/compute/cudnn/secure/8.4.0/local_installers/11.6/cudnn-windows-x86_64-8.4.0.27_cuda11.6-archive.zip)，参考：[win11下利用conda进行pytorch安装-cuda11.6-泛用安装思路](https://blog.csdn.net/qq_34740266/article/details/129137794)
+pip install langchain==0.0.292
+pip install gradio==4.4.0
+pip install chromadb==0.4.15
+pip install sentence-transformers==2.2.2
+pip install unstructured==0.10.30
+pip install markdown==3.3.7
+```
+* 下载开源词向量模型    
+同时，我们需要使用到开源词向量模型 [Sentence Transformer](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2):（我们也可以选用别的开源词向量模型来进行 Embedding，目前选用这个模型是相对    轻量、支持中文且效果较好的）
 
-* 在Python当中调用SoulChat模型    
+* 首先需要使用 `huggingface` 官方提供的 `huggingface-cli` 命令行工具。安装依赖:
+
+```
+pip install -U huggingface_hub
+```
+
+* 然后在根目录下新建python文件 `download.py`，填入以下代码：
 ```python
-import torch
-from transformers import AutoModel, AutoTokenizer
-# GPU设置
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-# 加载模型与tokenizer
-model_name_or_path = 'scutcyr/SoulChat'
-model = AutoModel.from_pretrained(model_name_or_path, trust_remote_code=True).half()
-model.to(device)
-tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, trust_remote_code=True)
+import os
+* 运行download.py进行下载
 
-# 单轮对话调用模型的chat函数
-user_input = "我失恋了，好难受！"
-input_text = "用户：" + user_input + "\n心理咨询师："
-response, history = model.chat(tokenizer, query=input_text, history=None, max_length=2048, num_beams=1, do_sample=True, top_p=0.75, temperature=0.95, logits_processor=None)
-
-# 多轮对话调用模型的chat函数
-# 注意：本项目使用"\n用户："和"\n心理咨询师："划分不同轮次的对话历史
-# 注意：user_history比bot_history的长度多1
-user_history = ['你好，老师', '我女朋友跟我分手了，感觉好难受']
-bot_history = ['你好！我是你的个人专属数字辅导员甜心老师，欢迎找我倾诉、谈心，期待帮助到你！']
-# 拼接对话历史
-context = "\n".join([f"用户：{user_history[i]}\n心理咨询师：{bot_history[i]}" for i in range(len(bot_history))])
-input_text = context + "\n用户：" + user_history[-1] + "\n心理咨询师："
-
-response, history = model.chat(tokenizer, query=input_text, history=None, max_length=2048, num_beams=1, do_sample=True, top_p=0.75, temperature=0.95, logits_processor=None)
+# 下载模型
+os.system('huggingface-cli download --resume-download sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 --local-dir /root/data/model/sentence-transformer')
 ```
+* 安装运行demo所需要的依赖
+```shell
+# 升级pip
+python -m pip install --upgrade pip
 
-
-* 启动服务   
-
-本项目提供了[soulchat_app.py](./soulchat_app.py)作为SoulChat模型的使用示例，通过以下命令即可开启服务，然后，通过http://<your_ip>:9026访问。
-```bash
-streamlit run soulchat_app.py --server.port 9026
+pip install modelscope==1.9.5
+pip install transformers==4.35.2
+pip install streamlit==1.24.0
+pip install sentencepiece==0.1.99
+pip install accelerate==0.24.1
 ```
-特别地，在[soulchat_app.py](./soulchat_app.py)当中，
-可以修改以下代码更换指定的显卡：
-```python
-os.environ['CUDA_VISIBLE_DEVICES'] = '2'
+   
+* 启动服务     
+本项目提供了[run_gradio.py](./run_gradio.py)作为模型的使用示例，接通过 python 命令运行，即可在本地启动知识库助手的 Web Demo，默认会在 7860 端口运行，接下来将服务器端口映射到本地端口即可访问
 ```
-**对于Windows单显卡用户，需要修改为：```os.environ['CUDA_VISIBLE_DEVICES'] = '0'```，否则会报错！**
-
-可以通过更改以下代码指定模型路径为本地路径：
-```python
-model_name_or_path = 'scutcyr/SoulChat'
+python run_gradio.py
 ```
-
 
 ## 示例
-* 样例1：失恋
-*
+* 整体布局
 <p align="center">
-    <img src="./figure/example_shilian.png" width=600px/>
+    <img src="./figure/整体布局.png" width=900px/>
+</p>  
+
+* 样例1：介绍一下呼和浩特的文化
+<p align="center">
+    <img src="./figure/文化.png" width=900px/>
 </p>
 
-* 样例2：宿舍关系
+* 样例2：介绍一下呼和浩特的大昭寺
 
 <p align="center">
-    <img src="./figure/example_sushe.png" width=600px/>
+    <img src="./figure/大昭寺.png" width=900px/>
 </p>
 
-* 样例3：期末考试
+* 样例3：内蒙古大学在呼和浩特的位置
 
 <p align="center">
-    <img src="./figure/example_kaoshi.png" width=600px/>
+    <img src="./figure/内蒙古大徐也.png" width=900px/>
 </p>
 
-* 样例4：科研压力
-
-<p align="center">
-    <img src="./figure/example_keyan.png" width=600px/>
-</p>
 
 ## 声明
 * 本项目使用了ChatGLM-6B 模型的权重，需要遵循其[MODEL_LICENSE](https://github.com/THUDM/ChatGLM-6B/blob/main/MODEL_LICENSE)，因此，**本项目仅可用于您的非商业研究目的**。
