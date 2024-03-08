@@ -1,5 +1,4 @@
 # HohhotLLM
-Urban Large Language Model for Hohhot (呼和浩特城市大模型)
 ## Urban Large Language Model for Hohhot (呼和浩特城市大模型)
 国内在垂直领域大模型的研究方面已经取得了显著的进展。随着深度学习技术的不断发展和计算能力的提升，越来越多的研究者开始关注如何利用大模型来解决特定领域的问题。
 本项目基于Langchain为基础，结合LLM大语言模型，并以丰富的呼和浩特城市数据为基础构建了本地问答知识库来宣传呼和浩特的城市文化。
