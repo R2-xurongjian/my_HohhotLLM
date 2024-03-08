@@ -130,7 +130,7 @@ python run_gradio.py
 
 * 样例1：介绍一下呼和浩特的文化
 <p align="center">
-    <img src="./figure/文化.png" width=900px/>
+    <img src="./figure/文化2.png" width=900px/>
 </p>
 
 * 样例2：介绍一下呼和浩特的大昭寺
@@ -145,6 +145,27 @@ python run_gradio.py
     <img src="./figure/内蒙古大学.png" width=900px/>
 </p>
 
+## 对比分析
+#### 内蒙古大学在呼和浩特的位置
+* GPT3.5生成
+<p align="center">
+    <img src="./figure/GPT2.png" width=900px/>
+</p>
+* 本项目生成
+<p align="center">
+    <img src="./figure/内蒙古大学.png" width=900px/>
+</p>
+
+#### 介绍一下呼和浩特的大昭寺
+* GPT3.5生成
+<p align="center">
+    <img src="./figure/GPT1.png" width=900px/>
+</p>
+* 本项目生成
+<p align="center">
+    <img src="./figure/大昭寺.png" width=900px/>
+</p>
+可以看出本项目在针对呼和浩特区域的文化上还是较为准确的，相比于火爆GPT3.5要更优越。
 
 ## 声明
 * 本项目使用了IntertnLM模型的权重，需要遵循其[LICENSE](https://github.com/InternLM/InternLM/blob/main/LICENSE)，因此，**本项目仅可用于您的非商业研究目的**。
