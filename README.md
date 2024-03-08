@@ -99,7 +99,7 @@ python run_gradio.py
 * 样例3：内蒙古大学在呼和浩特的位置
 
 <p align="center">
-    <img src="./figure/内蒙古大徐也.png" width=900px/>
+    <img src="./figure/内蒙古大学.png" width=900px/>
 </p>
 
 
